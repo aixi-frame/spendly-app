@@ -20,7 +20,7 @@
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
-            <a href="#" class="btn-primary">See how it works</a>
+            <a href="javascript:void(0)" id="open-modal" class="btn-primary">See how it works</a>
         </div>
         <div class="hero-visual">
             <div class="mock-card-updated">
@@ -63,7 +63,15 @@
     </div>
 </section>
 
-<section class="features">
+<div id="video-modal" class="modal-overlay">
+    <div class="modal-container">
+        <span class="modal-close">&times;</span>
+        <div class="modal-video-wrapper">
+            <iframe id="modal-iframe" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
     <div class="features-inner">
         <div class="feature-card">
             <div class="feature-icon">₹</div>
@@ -91,4 +99,33 @@
     </div>
 </section>
 
+<script>
+    (function() {
+        const openBtn = document.getElementById('open-modal');
+        const modal = document.getElementById('video-modal');
+        const closeBtn = document.querySelector('.modal-close');
+        const iframe = document.getElementById('modal-iframe');
+        const originalSrc = iframe.src;
+
+        function openModal() {
+            modal.style.display = 'flex';
+            iframe.src = originalSrc;
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            iframe.src = '';
+            iframe.src = originalSrc;
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    })();
+</script>
 {% endblock %}

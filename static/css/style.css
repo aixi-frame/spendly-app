@@ -125,16 +125,25 @@ a { color: inherit; text-decoration: none; }
 
 .hero {
     padding: 5rem 2rem 4rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
     max-width: var(--max-width);
     margin: 0 auto;
 }
 
+.hero-inner.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
 .hero-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: var(--accent-light);
     color: var(--accent);
     font-size: 0.75rem;
@@ -146,6 +155,13 @@ a { color: inherit; text-decoration: none; }
     margin-bottom: 1.5rem;
 }
 
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+}
+
 .hero-title {
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 5vw, 4rem);
@@ -155,8 +171,7 @@ a { color: inherit; text-decoration: none; }
     margin-bottom: 1.25rem;
 }
 
-.hero-title em {
-    font-style: italic;
+.title-accent {
     color: var(--accent);
 }
 
@@ -164,7 +179,7 @@ a { color: inherit; text-decoration: none; }
     font-size: 1.05rem;
     color: var(--ink-muted);
     line-height: 1.7;
-    max-width: 460px;
+    max-width: 560px;
     margin-bottom: 2rem;
 }
 
@@ -172,85 +187,107 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     gap: 1rem;
     align-items: center;
+    margin-bottom: 4rem;
 }
 
 /* ------------------------------------------------------------------ */
-/* Mock card (hero visual)                                             */
+/* Updated Hero Visual Component                                         */
 /* ------------------------------------------------------------------ */
 
 .hero-visual {
     display: flex;
     justify-content: center;
+    width: 100%;
 }
 
-.mock-card {
+.mock-card-updated {
     background: var(--paper-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 2rem;
     width: 100%;
-    max-width: 380px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+    max-width: 800px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.05);
 }
 
-.mock-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1.75rem;
-    padding-bottom: 1.25rem;
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
     border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
-.mock-label {
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.stat-label {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
 }
 
-.mock-total {
+.stat-value {
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     color: var(--ink);
+    margin-bottom: 0.25rem;
 }
 
-.mock-bars { display: flex; flex-direction: column; gap: 1rem; }
+.stat-trend {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+}
 
-.mock-bar-row {
+.stat-trend.positive {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.spending-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.bar-row {
     display: grid;
-    grid-template-columns: 80px 1fr 60px;
+    grid-template-columns: 100px 1fr 80px;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1.5rem;
 }
 
-.mock-cat {
-    font-size: 0.8rem;
+.bar-label {
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--ink-soft);
+    text-align: left;
 }
 
-.mock-bar-track {
-    height: 6px;
+.bar-track {
+    height: 8px;
     background: var(--border-soft);
     border-radius: 999px;
     overflow: hidden;
 }
 
-.mock-bar {
+.bar-fill {
     height: 100%;
-    background: var(--accent);
     border-radius: 999px;
     transition: width 0.6s ease;
 }
 
-.mock-bar-2 { background: var(--accent-2); }
-.mock-bar-3 { background: #5b7fa6; }
-.mock-bar-4 { background: #8b5e83; }
+.bar-food { background: #f39c12; }
+.bar-travel { background: #3498db; }
+.bar-bills { background: #9b59b6; }
 
-.mock-amt {
-    font-size: 0.8rem;
+.bar-amt {
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--ink-muted);
     text-align: right;

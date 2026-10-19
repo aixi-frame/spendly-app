@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Terms and Conditions — Spendly{% endblock %}
+
+{% block content %}
+<div class="auth-section">
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1 class="auth-title">Terms and Conditions</h1>
+            <p class="auth-subtitle">Last updated: October 19, 2026</p>
+        </div>
+
+        <div class="auth-card">
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <section>
+                    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--ink);">1. Acceptance of Terms</h3>
+                    <p style="font-size: 0.95rem; color: var(--ink-muted);">By accessing and using Spendly, you agree to be bound by these Terms and Conditions and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.</p>
+                </section>
+
+                <section>
+                    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--ink);">2. Use of Service</h3>
+                    <p style="font-size: 0.95rem; color: var(--ink-muted);">Spendly is provided as a personal finance tracking tool. You agree to use the service only for lawful purposes. You are responsible for maintaining the confidentiality of your account and password and for all activities that occur under your account.</p>
+                </section>
+
+                <section>
+                    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--ink);">3. User Data</h3>
+                    <p style="font-size: 0.95rem; color: var(--ink-muted);">We value your privacy. All financial data entered into Spendly is used solely for the purpose of providing you with spending insights and summaries. We do not sell your personal financial data to third parties.</p>
+                </section>
+
+                <section>
+                    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--ink);">4. Limitations of Liability</h3>
+                    <p style="font-size: 0.95rem; color: var(--ink-muted);">Spendly is provided "as is" without any warranties. In no event shall Spendly be liable for any damages (including, without limitation, damages for loss of data or profit) arising out of the use or inability to use the materials on Spendly.</p>
+                </section>
+
+                <section>
+                    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--ink);">5. Changes to Terms</h3>
+                    <p style="font-size: 0.95rem; color: var(--ink-muted);">Spendly reserves the right to revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then-current version of these Terms and Conditions.</p>
+                </section>
+            </div>
+        </div>
+
+        <div class="auth-switch" style="margin-top: 1.5rem;">
+            <a href="{{ url_for('landing') }}">← Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

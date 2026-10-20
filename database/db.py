@@ -12,7 +12,23 @@ def get_db():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+def create_user(name, email, password):
+    """
+    Hashes password and creates a new user in the database.
+    Returns the new user's id.
+    Raises sqlite3.IntegrityError if email already exists.
+    """
+    password_hash = generate_password_hash(password)
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+            (name, email, password_hash)
+        )
+        conn.commit()
+        return cursor.lastrowid
+
 def init_db():
+
     """
     Creates all tables using CREATE TABLE IF NOT EXISTS.
     """

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, session
-from database.db import init_db, seed_db, create_user, get_user_by_email
+from database.db import init_db, seed_db, create_user, get_user_by_email, get_db
 import sqlite3
 from werkzeug.security import check_password_hash
 
@@ -10,6 +10,19 @@ with app.app_context():
     init_db()
     seed_db()
 
+
+# ------------------------------------------------------------------ #
+# Context Processors                                                     #
+# ------------------------------------------------------------------ #
+
+@app.context_processor
+def inject_user_name():
+    if session.get("user_id"):
+        with get_db() as conn:
+            user = conn.execute("SELECT name FROM users WHERE id = ?", (session["user_id"],)).fetchone()
+            if user:
+                return dict(current_user_name=user["name"])
+    return dict(current_user_name=None)
 
 # ------------------------------------------------------------------ #
 # Routes                                                              #
@@ -54,7 +67,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("user_id"):
-        return redirect(url_for("landing"))
+        return redirect(url_for("profile"))
 
     if request.method == "POST":
         email = request.form.get("email")
@@ -64,7 +77,7 @@ def login():
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
             flash("Logged in successfully!", "success")
-            return redirect(url_for("landing"))
+            return redirect(url_for("profile"))
 
         flash("Invalid email or password.", "error")
         return render_template("login.html")
@@ -95,7 +108,44 @@ def logout():
 
 @app.route("/profile")
 def profile():
-    return "Profile page — coming in Step 4"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    # Hardcoded data for design validation (Step 4)
+    user_data = {
+        "name": "Amarjeet Kumar",
+        "email": "amarjeet@example.com",
+        "member_since": "October 2023",
+        "initials": "AK"
+    }
+
+    summary_stats = {
+        "total_spent": "₹12,450.00",
+        "transaction_count": 24,
+        "top_category": "Food & Dining"
+    }
+
+    transactions = [
+        {"date": "2026-10-20", "description": "Starbucks Coffee", "category": "Food & Dining", "amount": "₹450.00"},
+        {"date": "2026-10-19", "description": "Uber Ride", "category": "Transport", "amount": "₹220.00"},
+        {"date": "2026-10-18", "description": "Amazon - Kindle Book", "category": "Entertainment", "amount": "₹899.00"},
+        {"date": "2026-10-17", "description": "Grocery Store", "category": "Food & Dining", "amount": "₹1,200.00"},
+    ]
+
+    category_breakdown = [
+        {"category": "Food & Dining", "amount": "₹4,500.00", "percentage": 36, "class": "bar-food"},
+        {"category": "Transport", "amount": "₹2,100.00", "percentage": 17, "class": "bar-travel"},
+        {"category": "Entertainment", "amount": "₹3,200.00", "percentage": 26, "class": "bar-bills"},
+        {"category": "Bills", "amount": "₹2,650.00", "percentage": 21, "class": "bar-food"},
+    ]
+
+    return render_template(
+        "profile.html",
+        user=user_data,
+        stats=summary_stats,
+        transactions=transactions,
+        breakdown=category_breakdown
+    )
 
 
 @app.route("/expenses/add")

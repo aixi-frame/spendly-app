@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, session
 from database.db import init_db, seed_db, create_user, get_user_by_email, get_db
+from database import queries
 import sqlite3
 from werkzeug.security import check_password_hash
 
@@ -76,6 +77,7 @@ def login():
         user = get_user_by_email(email)
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
+            print(f"DEBUG: User logged in. ID: {user['id']}, Email: {email}")
             flash("Logged in successfully!", "success")
             return redirect(url_for("profile"))
 
@@ -111,33 +113,45 @@ def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    # Hardcoded data for design validation (Step 4)
-    user_data = {
-        "name": "Amarjeet Kumar",
-        "email": "amarjeet@example.com",
-        "member_since": "October 2023",
-        "initials": "AK"
-    }
+    user_id = session["user_id"]
+    user_data = queries.get_user_by_id(user_id)
+    if not user_data:
+        session.clear()
+        flash("User account not found.", "error")
+        return redirect(url_for("login"))
 
-    summary_stats = {
-        "total_spent": "₹12,450.00",
-        "transaction_count": 24,
-        "top_category": "Food & Dining"
-    }
+    # Summary Stats
+    summary_stats = queries.get_summary_stats(user_id)
+    summary_stats["total_spent"] = f"₹{summary_stats['total_spent']:,.2f}"
 
+    # Fetch recent transactions from database
+    recent_transactions = queries.get_recent_transactions(user_id)
     transactions = [
-        {"date": "2026-10-20", "description": "Starbucks Coffee", "category": "Food & Dining", "amount": "₹450.00"},
-        {"date": "2026-10-19", "description": "Uber Ride", "category": "Transport", "amount": "₹220.00"},
-        {"date": "2026-10-18", "description": "Amazon - Kindle Book", "category": "Entertainment", "amount": "₹899.00"},
-        {"date": "2026-10-17", "description": "Grocery Store", "category": "Food & Dining", "amount": "₹1,200.00"},
+        {**t, "amount": f"₹{t['amount']:,.2f}"}
+        for t in recent_transactions
     ]
 
-    category_breakdown = [
-        {"category": "Food & Dining", "amount": "₹4,500.00", "percentage": 36, "class": "bar-food"},
-        {"category": "Transport", "amount": "₹2,100.00", "percentage": 17, "class": "bar-travel"},
-        {"category": "Entertainment", "amount": "₹3,200.00", "percentage": 26, "class": "bar-bills"},
-        {"category": "Bills", "amount": "₹2,650.00", "percentage": 21, "class": "bar-food"},
-    ]
+    # Category breakdown logic
+    raw_breakdown = queries.get_category_breakdown(user_id)
+
+    category_class_map = {
+        "Food": "bar-food",
+        "Food & Dining": "bar-food",
+        "Transport": "bar-travel",
+        "Entertainment": "bar-entertainment",
+        "Bills": "bar-bills",
+        "Other": "bar-other"
+    }
+
+    category_breakdown = []
+    for item in raw_breakdown:
+        category = item["category"]
+        category_breakdown.append({
+            "category": category,
+            "amount": f"₹{item['amount']:,.2f}",
+            "percentage": item["pct"],
+            "class": category_class_map.get(category, "bar-other")
+        })
 
     return render_template(
         "profile.html",

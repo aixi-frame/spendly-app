@@ -16,6 +16,39 @@
         </div>
     </section>
 
+    <!-- Filter Bar -->
+    <section class="filter-bar">
+        <div class="filter-presets">
+            <a href="{{ url_for('profile') }}"
+               class="filter-btn {{ 'active' if not active_from and not active_to }}"
+               data-preset="all">All Time</a>
+
+            <a href="{{ url_for('profile', date_from=presets.month.from, date_to=presets.month.to) }}"
+               class="filter-btn {{ 'active' if active_from == presets.month.from and active_to == presets.month.to }}"
+               data-preset="month">This Month</a>
+
+            <a href="{{ url_for('profile', date_from=presets['3m'].from, date_to=presets['3m'].to) }}"
+               class="filter-btn {{ 'active' if active_from == presets['3m'].from and active_to == presets['3m'].to }}"
+               data-preset="3m">Last 3 Months</a>
+
+            <a href="{{ url_for('profile', date_from=presets['6m'].from, date_to=presets['6m'].to) }}"
+               class="filter-btn {{ 'active' if active_from == presets['6m'].from and active_to == presets['6m'].to }}"
+               data-preset="6m">Last 6 Months</a>
+        </div>
+
+        <form class="filter-custom" method="GET" action="{{ url_for('profile') }}">
+            <div class="input-group">
+                <label for="date_from">From</label>
+                <input type="date" name="date_from" id="date_from" value="{{ active_from or '' }}">
+            </div>
+            <div class="input-group">
+                <label for="date_to">To</label>
+                <input type="date" name="date_to" id="date_to" value="{{ active_to or '' }}">
+            </div>
+            <button type="submit" class="btn-primary">Apply</button>
+        </form>
+    </section>
+
     <!-- Summary Stats -->
     <section class="stat-grid">
         <div class="stat-card">
@@ -55,6 +88,11 @@
                             <td class="text-right font-medium">{{ tx.amount }}</td>
                         </tr>
                         {% endfor %}
+                        {% if not transactions %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No transactions found for this period.</td>
+                        </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -73,6 +111,9 @@
                     <span class="bar-amt">{{ cat.amount }}</span>
                 </div>
                 {% endfor %}
+                {% if not breakdown %}
+                <div class="text-center text-muted">No data for this period.</div>
+                {% endif %}
             </div>
         </section>
     </div>

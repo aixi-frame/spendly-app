@@ -3,6 +3,8 @@ from database.db import init_db, seed_db, create_user, get_user_by_email, get_db
 from database import queries
 import sqlite3
 from werkzeug.security import check_password_hash
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-key-for-session-flashing"
@@ -10,6 +12,45 @@ app.secret_key = "spendly-dev-key-for-session-flashing"
 with app.app_context():
     init_db()
     seed_db()
+
+def get_date_filters(date_from, date_to):
+    """
+    Validates date filters and computes presets.
+    Returns (error_msg, validated_from, validated_to, presets_dict)
+    """
+    validated_from = None
+    validated_to = None
+
+    if date_from and date_to:
+        try:
+            datetime.strptime(date_from, "%Y-%m-%d")
+            datetime.strptime(date_to, "%Y-%m-%d")
+
+            if date_from > date_to:
+                return "Start date must be before end date.", None, None, {}
+
+            validated_from = date_from
+            validated_to = date_to
+        except ValueError:
+            return "Invalid date format provided. Please use YYYY-MM-DD.", None, None, {}
+
+    today = datetime.now().date()
+    presets = {
+        "month": {
+            "from": today.replace(day=1).isoformat(),
+            "to": today.isoformat()
+        },
+        "3m": {
+            "from": (today - timedelta(days=90)).isoformat(),
+            "to": today.isoformat()
+        },
+        "6m": {
+            "from": (today - timedelta(days=180)).isoformat(),
+            "to": today.isoformat()
+        }
+    }
+
+    return None, validated_from, validated_to, presets
 
 
 # ------------------------------------------------------------------ #
@@ -120,19 +161,27 @@ def profile():
         flash("User account not found.", "error")
         return redirect(url_for("login"))
 
+    # Date Filter Handling
+    date_from = request.args.get("date_from")
+    date_to = request.args.get("date_to")
+
+    error_msg, validated_from, validated_to, presets = get_date_filters(date_from, date_to)
+    if error_msg:
+        flash(error_msg, "error")
+
     # Summary Stats
-    summary_stats = queries.get_summary_stats(user_id)
+    summary_stats = queries.get_summary_stats(user_id, validated_from, validated_to)
     summary_stats["total_spent"] = f"₹{summary_stats['total_spent']:,.2f}"
 
     # Fetch recent transactions from database
-    recent_transactions = queries.get_recent_transactions(user_id)
+    recent_transactions = queries.get_recent_transactions(user_id, date_from=validated_from, date_to=validated_to)
     transactions = [
         {**t, "amount": f"₹{t['amount']:,.2f}"}
         for t in recent_transactions
     ]
 
     # Category breakdown logic
-    raw_breakdown = queries.get_category_breakdown(user_id)
+    raw_breakdown = queries.get_category_breakdown(user_id, validated_from, validated_to)
 
     category_class_map = {
         "Food": "bar-food",
@@ -158,7 +207,10 @@ def profile():
         user=user_data,
         stats=summary_stats,
         transactions=transactions,
-        breakdown=category_breakdown
+        breakdown=category_breakdown,
+        active_from=validated_from,
+        active_to=validated_to,
+        presets=presets
     )
 
 

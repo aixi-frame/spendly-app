@@ -125,3 +125,22 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
             breakdown[0]["pct"] += diff
 
         return breakdown
+
+def insert_expense(user_id, amount, category, date, description):
+    """
+    Inserts a new expense record into the database.
+    Returns the ID of the inserted row.
+    """
+    # Ensure description is None if empty string
+    desc = description.strip() if description else None
+    if desc == "":
+        desc = None
+
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO expenses (user_id, amount, category, date, description) VALUES (?, ?, ?, ?, ?)",
+            (user_id, amount, category, date, desc)
+        )
+        conn.commit()
+        return cursor.lastrowid
+

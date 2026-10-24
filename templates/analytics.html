@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Spendly{% endblock %}
+
+{% block head %}
+<style>
+    .analytics-coming-soon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #f3f3f3;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .coming-soon-card {
+        background-color: white;
+        border: 1px solid #e6e6e6;
+        border-radius: 28px;
+        width: 612px;
+        height: 570px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 60px 46px 60px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .corner-accent-tl {
+        position: absolute;
+        width: 192px;
+        height: 192px;
+        right: -97px;
+        top: -97px;
+        pointer-events: none;
+    }
+
+    .corner-accent-bl {
+        position: absolute;
+        width: 192px;
+        height: 192px;
+        left: -97px;
+        bottom: -97px;
+        pointer-events: none;
+    }
+
+    .announcement-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .clock-tile {
+        width: 116px;
+        height: 116px;
+        display: block;
+    }
+
+    .message-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .coming-soon-badge {
+        background-color: #525252;
+        color: white;
+        padding: 0 24px;
+        height: 46px;
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .main-title {
+        font-family: 'DM Serif Display', serif;
+        font-weight: bold;
+        font-size: 34px;
+        color: #3e3e3e;
+        text-align: center;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .description {
+        font-size: 19px;
+        color: #747474;
+        text-align: center;
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    .progress-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .progress-dots {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+    }
+
+    .dot {
+        width: 15px;
+        height: 15px;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.4; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1); }
+    }
+
+    .progress-text {
+        font-size: 14px;
+        color: #aaa;
+        text-align: center;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-coming-soon">
+    <div class="coming-soon-card">
+        <img src="{{ url_for('static', filename='images/corner_accent.svg') }}" class="corner-accent-tl" alt="">
+        <img src="{{ url_for('static', filename='images/corner_accent.svg') }}" class="corner-accent-bl" alt="">
+
+        <div class="announcement-content">
+            <img src="{{ url_for('static', filename='images/clock_tile.svg') }}" class="clock-tile" alt="Clock Icon">
+
+            <div class="message-group">
+                <div class="coming-soon-badge">Coming Soon</div>
+                <h1 class="main-title">Advanced Analytics</h1>
+                <p class="description">
+                    We're working on powerful insights and<br>
+                    visualizations to help you understand your spending<br>
+                    patterns better.
+                </p>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-dots">
+                    <img src="{{ url_for('static', filename='images/progress_dot_1.svg') }}" class="dot" alt="">
+                    <img src="{{ url_for('static', filename='images/progress_dot_2.svg') }}" class="dot" alt="">
+                    <img src="{{ url_for('static', filename='images/progress_dot_3.svg') }}" class="dot" alt="">
+                </div>
+                <p class="progress-text">We're crafting something special</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

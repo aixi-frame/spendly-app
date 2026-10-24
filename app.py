@@ -2,12 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, flash, abo
 from database.db import init_db, seed_db, create_user, get_user_by_email, get_db
 from database import queries
 import sqlite3
+import os
 from werkzeug.security import check_password_hash
 from datetime import datetime, timedelta
 
-
 app = Flask(__name__)
-app.secret_key = "spendly-dev-key-for-session-flashing"
+app.secret_key = os.environ.get("SECRET_KEY", "spendly-dev-key-for-session-flashing")
+
+VALID_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
 
 with app.app_context():
     init_db()
@@ -66,6 +68,10 @@ def inject_user_name():
                 return dict(current_user_name=user["name"])
     return dict(current_user_name=None)
 
+@app.context_processor
+def inject_today():
+    return dict(today=datetime.now().date().isoformat())
+
 # ------------------------------------------------------------------ #
 # Routes                                                              #
 # ------------------------------------------------------------------ #
@@ -118,7 +124,6 @@ def login():
         user = get_user_by_email(email)
         if user and check_password_hash(user["password_hash"], password):
             session["user_id"] = user["id"]
-            print(f"DEBUG: User logged in. ID: {user['id']}, Email: {email}")
             flash("Logged in successfully!", "success")
             return redirect(url_for("profile"))
 
@@ -138,8 +143,15 @@ def privacy():
     return render_template("privacy.html")
 
 
+@app.route("/analytics")
+def analytics():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+    return render_template("analytics.html")
+
+
 # ------------------------------------------------------------------ #
-# Placeholder routes — students will implement these                  #
+# User Expenses                                                          #
 # ------------------------------------------------------------------ #
 
 @app.route("/logout")
@@ -214,9 +226,46 @@ def profile():
     )
 
 
-@app.route("/expenses/add")
+@app.route("/expenses/add", methods=["GET", "POST"])
 def add_expense():
-    return "Add expense — coming in Step 7"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        amount_raw = request.form.get("amount")
+        category = request.form.get("category")
+        date = request.form.get("date")
+        description = request.form.get("description")
+
+        # Validation
+        try:
+            amount = float(amount_raw)
+            if amount <= 0:
+                raise ValueError("Amount must be positive.")
+        except (ValueError, TypeError):
+            flash("Please enter a valid positive amount.", "error")
+            return render_template("add_expense.html")
+
+        if not category or category not in VALID_CATEGORIES:
+            flash("Please select a valid category.", "error")
+            return render_template("add_expense.html")
+
+        if not date:
+            flash("Please select a valid date.", "error")
+            return render_template("add_expense.html")
+
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            flash("Invalid date format.", "error")
+            return render_template("add_expense.html")
+
+        # Save to DB
+        queries.insert_expense(session["user_id"], amount, category, date, description)
+        flash("Expense added successfully!", "success")
+        return redirect(url_for("profile"))
+
+    return render_template("add_expense.html")
 
 
 @app.route("/expenses/<int:id>/edit")

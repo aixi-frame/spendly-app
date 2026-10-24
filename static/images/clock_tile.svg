@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="116" height="116" viewBox="0 0 116 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Clock tile">
+<rect width="116" height="116" rx="20" fill="#3E3E3E"/>
+<path id="Clock face" d="M77.5 58C77.5 68.7696 68.7696 77.5 58 77.5C47.2304 77.5 38.5 68.7696 38.5 58C38.5 47.2304 47.2304 38.5 58 38.5C68.7696 38.5 77.5 47.2304 77.5 58Z" stroke-width="5" stroke="white"/>
+<path id="Clock hands" d="M56 43V58L70 65" stroke-width="5" stroke-linecap="round" stroke="white"/>
+</g>
+</svg>
